@@ -20,7 +20,7 @@ db = SQLAlchemy(app)
 
 class TestTable(db.Model): 
     #__tablename__ = 'testtableplswork'
-    __table_ args__ = {'schema':'hoteldbs'}
+    __table_args__ = {'schema':'hoteldbs'}
     age = db.Column(db.Integer,primary_key = True)
 
     def __init__(self, age):
@@ -30,7 +30,7 @@ class TestTable(db.Model):
 class EmpTable(db.Model):
     __tablename__ = 'employee'
     #below line of code will be how you direct the table to the right schema in the database on postrgre. 
-    __table_ args__ = {'schema':'hoteldbs'}
+    __table_args__ = {'schema':'hoteldbs'}
     emp_sin_number = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(50))
     middle_name = db.Column(db.String(50))
