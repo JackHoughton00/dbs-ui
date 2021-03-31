@@ -5,27 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <link rel="stylesheet" href="../static/style.css" />
-    <title>Please rate your service</title>
+    <title>Homepage</title>
   </head>
   <body>
     <div class="container">
-      <form action="/submit" method="POST">
+      {% if message %}
+        <p class="message">{{message}}</p>
+      {% endif %}
+      <form action="/homeSubmit" method="POST">
         <div class="form-group">
-          <h3>Role</h3>
-          <select name="Select Role">
-            <option value="">Select Role</option>
-            <option value="Admin">Admin</option>
-            <option value="Employee">Employee</option>
-            <option value="Customer">Customer</option>
-          </select>
+          <h3>Welcome To The Hotel Database System!</h3>
         </div>
         <div class="form-group">
-          <h3>SIN Number</h3>
-          <input
-            type="text"
-            name="sin"
-            placeholder="Name of vehicle owner"
-          />
+          <h3>Please select your role to log-in as!</h3>
+          <select name="role">
+            <option value='holder'>Select A Role</option>
+            <option value="admin">Admin</option>
+            <option value="customer">Customer</option>
+            <option value="employee">Employee</option>
+          </select>
         </div>
         <input type="submit" value="Submit" class="btn" />
       </form>

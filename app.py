@@ -9,7 +9,7 @@ ENV = 'dev'
 if ENV == 'dev':
     app.debug = True
     #In the next line change USERNAME to your uOttawa login before the @uOttawa.ca and change PASSWORD to your uOttawa password
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://USERNAME:PASSWORD@web0.eecs.uottawa.ca:15432/group_a03_g30' 
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://USERNAME@:PASSWORD@web0.eecs.uottawa.ca:15432/group_a03_g30' 
 else:
     app.debug = False
     app.config['SQLALCHEMY_DATABASE_URI'] = ''
@@ -62,36 +62,28 @@ class EmpTable(db.Model):
 
 
 @app.route('/')
-def index():
-    return render_template('index.html')
+def homePage():
+    return render_template('homePage.html')
 
 
-@app.route('/submit', methods=['POST'])
+@app.route('/homeSubmit', methods=['POST'])
 def submit():
     if request.method == 'POST':
-        emp_sin_number = request.form['emp_sin_number']
-        first_name = request.form['first_name']
-        middle_name = request.form['middle_name']
-        last_name = request.form['last_name']
-        house_number = request.form['house_number']
-        street_name = request.form['street_name']
-        postal_code = request.form['postal_code']
-        apt_number = request.form['apt_number']
-        city = request.form['city']
-        country = request.form['country']
-        phone_number = request.form['phone_number']
-        salary = request.form['salary']
+        role = request.form['role']
 
-        # print(customer, dealer, rating, comments)
-        if emp_sin_number == '' :
-            return render_template('index.html', message='Please enter required fields')
-        else:
-            #data = EmpTable(emp_sin_number, first_name, middle_name, last_name, house_number, street_name, postal_code, apt_number, city, country, phone_number, salary)
-            #db.session.add(data)
-            #db.session.commit()
-            return render_template('success.html')
-        #return render_template('index.html', message='You have already submitted!')
+        if role == 'customer':
+            return render_template('customerPage.html')
+        elif role == 'employee':
+            return render_template('employeePage.html')
+        elif role == 'admin':
+            return render_template('homePage.html', message = 'You do not have permission for this. ')
+        else: 
+            return render_template('homePage.html', message = 'You did not select a role. Please select a role before submitting.')
 
+
+
+
+        
 
 if __name__ == '__main__':
     app.run()

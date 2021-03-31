@@ -6,6 +6,12 @@ These two links were used as the foundation for the webapp. Some chunks of code 
 from the GitHub repository, but the overall project had to be modified for our groups needs. 
 
 
+IMPORTANT NOTE: 
+
+In order to connect to the database you will need to go to line 12 on app.py and enter your login credentials
+as you normally would when signing into pgAdmin4. Without this step being followed the web app will not be functional. 
+
+
 
 
 
