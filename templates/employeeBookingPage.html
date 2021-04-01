@@ -1,0 +1,39 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="../static/style.css" />
+    <title>Employee Booking Page</title>
+  </head>
+  <body>
+    <div class="container">
+    {% if message %}
+        <p class="message">{{message}}</p>
+    {% endif %}
+      <h1>Welcome To The Employee Booking Page!</h1>
+      <p>On this page you will be able to book the available hotel that you have already searched for.<br/> 
+        In order to complete the booking, you must input some personal data of the customer.
+        <br/>Once you are done this please press the button titled 'Finish Booking' 
+        <br/>If you wish to go back to the search page, please press the button titled 'To Search'.
+        <br/>If you wish to return to the homepage, please click on the button titled 'Go Home'.
+    </p>
+        <form action="/backHome" method="POST">
+          <input type="submit" value="Go Home" class="btn" />
+        </form>
+        <form action="/employeeBackToSearch" method="POST">
+            <input type="submit" value="To Search" class="btn"/>
+        </form>
+        <form action="/employeeFinishBooking"  method = "POST">
+          <input type="submit" value ="Finish Booking" class = "btn"/>
+        </form> 
+
+
+      
+
+    
+
+
+    </div>
+  </body>
+</html>

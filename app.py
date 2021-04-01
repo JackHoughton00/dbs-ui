@@ -61,6 +61,15 @@ class EmpTable(db.Model):
         self.salary = salary 
 
 
+
+#Handling requests that are applicible throughout the entirety of the web app
+@app.route('/backHome', methods=['POST'])
+def backHome():
+    if request.method == 'POST':
+        return render_template('homePage.html')
+
+
+#Handling requests that are applicable on the home page of the web app.
 @app.route('/')
 def homePage():
     return render_template('homePage.html')
@@ -72,9 +81,9 @@ def submit():
         role = request.form['role']
 
         if role == 'customer':
-            return render_template('customerPage.html')
+            return render_template('customerSearchPage.html')
         elif role == 'employee':
-            return render_template('employeePage.html')
+            return render_template('employeeSearchPage.html')
         elif role == 'admin':
             return render_template('homePage.html', message = 'You do not have permission for this. ')
         else: 
@@ -83,6 +92,39 @@ def submit():
 
 
 
+#Handling requests on the customer side of the web app 
+@app.route('/customerToBooking', methods=['POST'])
+def customerToBooking():
+    if request.method == 'POST':
+        return render_template('customerBookingPage.html')
+
+@app.route('/customerBackToSearch', methods=['POST'])
+def customerToSearch():
+    if request.method == 'POST': 
+        return render_template('customerSearchPage.html')
+
+@app.route('/customerFinishBooking',methods=['POST'])
+def customerFinishBooking():
+    if request.method == 'POST':
+        return render_template('customerBookingPage.html',message = 'Not yet implemented!!!!!!!')  
+
+
+
+#Handling requests on the employee side of the web app
+@app.route('/employeeToBooking', methods=['POST'])
+def employeeToBooking():
+    if request.method == 'POST':
+        return render_template('employeeBookingPage.html')
+
+@app.route('/employeeBackToSearch', methods=['POST'])
+def employeeToSearch():
+    if request.method == 'POST':
+        return render_template('employeeSearchPage.html')
+
+@app.route('/employeeFinishBooking',methods=['POST'])
+def employeeFinishBooking():
+    if request.method == 'POST':
+        return render_template('employeeBookingPage.html',message="Not yet implimented!!!!!")
         
 
 if __name__ == '__main__':

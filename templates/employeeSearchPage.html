@@ -1,0 +1,26 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="../static/style.css" />
+    <title>Employee Search Page</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Welcome To The Employee Page!</h1>
+      <p>On this page you will be able to search for available hotel rooms.
+        <br/>Should you wish to book an available room, after you have found your desired please click on the button titled 'Proceed To Booking'.
+        <br/>Should you wish to return to the homepage, please click on the button titled 'Go Back'.  
+      </p>
+        <form action="/backHome" method="POST">
+          <input type="submit" value="Go Back" class="btn" />
+        </form>
+        <form action="/employeeToBooking"  method = "POST">
+          <input type="submit" value ="Proceed To Booking" class = "btn"/>
+        </form> 
+    </div>
+  </body>
+</html>
