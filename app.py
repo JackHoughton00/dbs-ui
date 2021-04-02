@@ -1,10 +1,6 @@
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
-#from flask_datepicker import datepicker
-
-
-
-
+from sqlalchemy.ext.automap import automap_base
 
 app = Flask(__name__)
 
@@ -13,7 +9,7 @@ ENV = 'dev'
 if ENV == 'dev':
     app.debug = True
     #In the next line change USERNAME to your uOttawa login before the @uOttawa.ca and change PASSWORD to your uOttawa password
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://USERNAME@:PASSWORD@web0.eecs.uottawa.ca:15432/group_a03_g30' 
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://USER:PASSWORD@web0.eecs.uottawa.ca:15432/group_a03_g30' 
 else:
     app.debug = False
     app.config['SQLALCHEMY_DATABASE_URI'] = ''
@@ -22,16 +18,23 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-class TestTable(db.Model): 
-    #__tablename__ = 'testtableplswork'
-    __table_args__ = {'schema':'hoteldbs'}
-    age = db.Column(db.Integer,primary_key = True)
 
-    def __init__(self, age):
-        self.age = age
+rooms = db.Table('rooms', db.metadata, autoload = True, autoload_with = db.engine)
 
 
-class EmpTable(db.Model):
+
+
+Base = automap_base()
+Base.prepare(db.engine,reflect =True)
+#Rooms = Base.classes.rooms
+ 
+
+class Rooms(Base):
+    __tablename__ = 'rooms'
+    __table_args__ = {'schema': 'hoteldbs'}
+
+
+class EmpTable(Base):
     __tablename__ = 'employee'
     #below line of code will be how you direct the table to the right schema in the database on postrgre. 
     __table_args__ = {'schema':'hoteldbs'}
@@ -110,7 +113,13 @@ def customerToSearch():
 @app.route('/customerFinishBooking',methods=['POST'])
 def customerFinishBooking():
     if request.method == 'POST':
-        return render_template('customerBookingPage.html',message = 'Not yet implemented!!!!!!!')  
+        return render_template('customerBookingPage.html',message = 'Not yet implemented!!!!!!!') 
+
+@app.route('/customerSearchRooms', methods=['POST'])
+def customerSearchRooms():
+    db.session.query(Rooms).all()
+    return render_template('customerSearchPage.html')
+
 
 
 
