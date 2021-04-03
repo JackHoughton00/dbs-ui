@@ -12,7 +12,8 @@ if ENV == 'dev':
     # In the next line change USERNAME to your uOttawa login before the @uOttawa.ca and change PASSWORD to your
     # uOttawa password
     app.config[
-        'SQLALCHEMY_DATABASE_URI'] = 'postgresql://jhoug049:EightExtended8ex@web0.eecs.uottawa.ca:15432/group_a03_g30'
+        'SQLALCHEMY_DATABASE_URI'] = 'postgresql://habol085:rb7FkRCtMqJ5Ved@web0.eecs.uottawa.ca:15432/group_a03_g30'
+        
 else:
     app.debug = False
     app.config['SQLALCHEMY_DATABASE_URI'] = ''
@@ -34,45 +35,6 @@ hotel_chain = db.Table('hotel_chain',db.metadata,autoload = True, autoload_with=
 # #Rooms = Base.classes.rooms
 # #RoomHotelChain = Base.classes.room_hotel_chain
 # RoomHC = Base.classes.room_hotel_chain 
-
-
-@app.route('/customerSearchRooms', methods=['POST'])
-def customerSearchRooms():
-
-    if request.method == 'POST':
-        cityName = request.form['citySelect']
-        bookingDate = request.form['startDate']
-
-        if cityName == 'losangeles':
-            cityName = 'Los Angeles'
-        elif cityName == 'riodejaneiro':
-            cityName = 'Rio de Janeiro'
-        elif cityName == 'newyorkcity':
-            cityName = 'New York City'
-        elif cityName == 'sanjose':
-            cityName = 'San Jose'
-        
-        cityName = cityName.capitalize()
-    
-        if cityName == '' or bookingDate == '':
-            return render_template('customerSearchPage.html', message = 'Either cityName or bookingDate is null.')
-        else:
-            
-            year = int(bookingDate[0:4])
-            month = int(bookingDate[5:7])
-            day = int(bookingDate[8:])
-            dateTimeFormatted = datetime.datetime(year, month ,day, 0, 0 )
-            result = db.session.query(rooms_hotel_chain,rooms,rooms,hotel_chain).select_from(rooms).join(rooms_hotel_chain).join(hotel_chain).filter(
-                hotel_chain.c.city == cityName and datetime(rooms.c.date_available) <= dateTimeFormatted).order_by(rooms.c.room_number.asc())
-            for r in result:
-                x = r[4]
-                if x <= dateTimeFormatted:
-                    print(r)
-            return render_template('customerSearchPage.html', message = 'City selected is:'+ cityName +' and the booking date is:'+ bookingDate)
-
-
-    
-
 
  
 # class Room_hotel_chain(db.Model):
@@ -147,13 +109,24 @@ def homePage():
     return render_template('homePage.html')
 
 
+
+
 @app.route('/homeSubmit', methods=['POST'])
 def submit():
+    result = db.session.query(hotel_chain.c.city)
+    
+    itemsList = set()
+    for r in result:
+        itemsList.add(r[0])
+
+    itemsList = sorted(itemsList)
+
+    print(itemsList)
     if request.method == 'POST':
         role = request.form['role']
 
         if role == 'customer':
-            return render_template('customerSearchPage.html')
+            return render_template('customerSearchPage.html', items=itemsList)
         elif role == 'employee':
             return render_template('employeeSearchPage.html')
         elif role == 'admin':
@@ -181,9 +154,61 @@ def customerFinishBooking():
     if request.method == 'POST':
         return render_template('customerBookingPage.html', message='Not yet implemented!!!!!!!')
 
-
-
 # CUSTOMER SEARCH ROOMS SHOULD BE HERE
+@app.route('/customerSearchRooms', methods=['POST'])
+def customerSearchRooms():
+
+
+    cityList = db.session.query(hotel_chain.c.city)
+    
+    itemsList = set()
+    for city in cityList:
+        itemsList.add(city[0])
+
+    itemsList = sorted(itemsList)
+
+    if request.method == 'POST':
+        cityName = request.form['citySelect']
+        bookingDate = request.form['startDate']
+
+        if cityName == 'Los angeles':
+            cityName = 'Los Angeles'
+        elif cityName == 'Rio de janeiro':
+            cityName = 'Rio de Janeiro'
+        elif cityName == 'New yorkcity':
+            cityName = 'New York City'
+        elif cityName == 'San jose':
+            cityName = 'San Jose'
+        
+        cityName = cityName.capitalize()
+    
+        if cityName == '' or bookingDate == '' or cityName=='holder':
+            return render_template('customerSearchPage.html', message = 'Either cityName or bookingDate is null.', items = itemsList )
+        else:
+            
+            year = int(bookingDate[0:4])
+            month = int(bookingDate[5:7])
+            day = int(bookingDate[8:])
+            dateTimeFormatted = datetime.datetime(year, month ,day, 0, 0 )
+            result = db.session.query(rooms_hotel_chain,rooms,rooms,hotel_chain).select_from(rooms).join(rooms_hotel_chain).join(hotel_chain).filter(
+                hotel_chain.c.city == cityName and datetime(rooms.c.date_available) <= dateTimeFormatted).order_by(rooms.c.room_number.asc())
+            finalResult = []   
+            for r in result:
+                tmpList = [] 
+                x = r[4]
+                if x <= dateTimeFormatted:
+                    tmpR3 = str(r[3])
+                    tmpR5 = str(r[5])
+                    tmpR6 = str(r[6])
+                    tmpList.append('Price: '+tmpR3)
+                    tmpList.append('View Type:'+ tmpR5)
+                    tmpList.append('Amenities:'+ tmpR6)  
+                    finalResult.append(tmpList)
+                    print(r)
+            return render_template('customerSearchPage.html',items = itemsList, results = result, roomDetails = finalResult)
+
+
+    
 
 
 
