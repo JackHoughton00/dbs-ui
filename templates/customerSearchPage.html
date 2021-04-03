@@ -17,7 +17,11 @@
         'Proceed To Booking'.<br/>
         Should you wish to return to the homepage, please click on the button titled 'Go Back'.</p>
         <hr/>
+        {% if message %}
+        <p class="message">{{message}}</p>
+        {% endif %}
         <span style="display: block; height: 50px;"></span>
+      <form action="/customerSearchRooms" method="POST">
         <div class="form-group">
           <h3>Select the city that you wish to book a room in</h3>
           <select name="citySelect">
@@ -27,16 +31,16 @@
             <option value="cancun">Cancun, Mexico</option>
             <option value="denver">Denver, USA</option>
             <option value="guadalajara">Guadalajara, Mexico</option>
-            <option value="losAngeles">Los Angeles, USA</option>
+            <option value="losangeles">Los Angeles, USA</option>
             <option value="meridia">Merida, Mexico</option>
             <option value="miami">Miami, USA</option>
-            <option value="nyc">New York City, USA</option>
+            <option value="newyorkcity">New York City, USA</option>
             <option value="orlando">Orlando, USA</option>
             <option value="ottawa">Ottawa, Canada</option>
             <option value="prestonburg">Prestonburg, USA</option>
-            <option value="rio">Rio de Janeiro, Brazil</option>
+            <option value="riodejaneiro">Rio de Janeiro, Brazil</option>
             <option value="salvador">Salvador, Brazil</option>
-            <option value="sanJose">San Jose, USA</option>
+            <option value="sanjose">San Jose, USA</option>
             <option value="seattle">Seattle, USA</option>
             <option value="toronto">Toronto, Canada</option>
             <option value="washington">Washinton, DC , USA</option>
@@ -47,8 +51,15 @@
           <span style="display: block; height: 10px;"></span>
         <label for="customerEndDate"><br/>Pick the date you want to book until</label>
           <input type="date" id = "endDate" name = "endDate"> 
-        <form action="/customerSearchRooms" method="POST">
-            <input type="submit" value="Search Rooms" class="btn" />
+        <input type="submit" value="Search Rooms" class="btn" />
+          <div class ='form-group'>
+            <h3>Choose the room booking</h3>
+            <select name = "roomSelect">
+                <option value="holder">Please choose from a room</option>
+            </select>            
+
+          </div>
+          
         </form>
         <span style="display: block; height: 100px;"></span>
         <form action="/backHome" method="POST">

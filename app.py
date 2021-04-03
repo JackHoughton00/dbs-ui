@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.automap import automap_base
+import datetime
 
 app = Flask(__name__)
 
@@ -11,7 +12,7 @@ if ENV == 'dev':
     # In the next line change USERNAME to your uOttawa login before the @uOttawa.ca and change PASSWORD to your
     # uOttawa password
     app.config[
-        'SQLALCHEMY_DATABASE_URI'] = 'postgresql://USERNAME:PASSWORD@web0.eecs.uottawa.ca:15432/group_a03_g30'
+        'SQLALCHEMY_DATABASE_URI'] = 'postgresql://jhoug049:EightExtended8ex@web0.eecs.uottawa.ca:15432/group_a03_g30'
 else:
     app.debug = False
     app.config['SQLALCHEMY_DATABASE_URI'] = ''
@@ -22,18 +23,83 @@ db = SQLAlchemy(app)
 
 rooms = db.Table('room', db.metadata, autoload=True, autoload_with=db.engine, schema='hoteldbs')
 
+rooms_hotel_chain = db.Table('room_hotel_chain', db.metadata, autoload=True, autoload_with=db.engine, schema='hoteldbs')
 
-#
+
+hotel_chain = db.Table('hotel_chain',db.metadata,autoload = True, autoload_with=db.engine, schema = 'hoteldbs')
+
+
 # Base = automap_base()
-# Base.prepare(db.engine,reflect =True)
+# Base.prepare(db.engine,  reflect =True, schema = 'hoteldbs')
 # #Rooms = Base.classes.rooms
-#
-#
+# #RoomHotelChain = Base.classes.room_hotel_chain
+# RoomHC = Base.classes.room_hotel_chain 
+
+
+@app.route('/customerSearchRooms', methods=['POST'])
+def customerSearchRooms():
+
+    if request.method == 'POST':
+        cityName = request.form['citySelect']
+        bookingDate = request.form['startDate']
+
+        if cityName == 'losangeles':
+            cityName = 'Los Angeles'
+        elif cityName == 'riodejaneiro':
+            cityName = 'Rio de Janeiro'
+        elif cityName == 'newyorkcity':
+            cityName = 'New York City'
+        elif cityName == 'sanjose':
+            cityName = 'San Jose'
+        
+        cityName = cityName.capitalize()
+    
+        if cityName == '' or bookingDate == '':
+            return render_template('customerSearchPage.html', message = 'Either cityName or bookingDate is null.')
+        else:
+            
+            year = int(bookingDate[0:4])
+            month = int(bookingDate[5:7])
+            day = int(bookingDate[8:])
+            dateTimeFormatted = datetime.datetime(year, month ,day, 0, 0 )
+            result = db.session.query(rooms_hotel_chain,rooms,rooms,hotel_chain).select_from(rooms).join(rooms_hotel_chain).join(hotel_chain).filter(
+                hotel_chain.c.city == cityName and datetime(rooms.c.date_available) <= dateTimeFormatted).order_by(rooms.c.room_number.asc())
+            for r in result:
+                x = r[4]
+                if x <= dateTimeFormatted:
+                    print(r)
+            return render_template('customerSearchPage.html', message = 'City selected is:'+ cityName +' and the booking date is:'+ bookingDate)
+
+
+    
+
+
+ 
+# class Room_hotel_chain(db.Model):
+#     __tablename__ = 'room_hotel_chain'
+#     __table_args__ = {'schema': 'hoteldbs'}
+
+#     room_number = db.Column(db.Integer, primary_key = True)
+#     hotel_id = db.Column(db.Integer)
+
+#     def __init__(self, room_number,hotel_id):
+#         self.room_number = room_number
+#         self.hotel_id = hotel_id
+
+
+
+
+
 # class Rooms(Base):
 #     __tablename__ = 'room'
 #     __table_args__ = {'schema': 'hoteldbs'}
-#
-#
+
+#     room_number = db.Column(db.Integer, primary_key = True)
+#     price = db.Column(db.Double)
+#     date_available 
+
+
+
 # class EmpTable(Base):
 #     __tablename__ = 'employee'
 #     #below line of code will be how you direct the table to the right schema in the database on postrgre.
@@ -116,12 +182,9 @@ def customerFinishBooking():
         return render_template('customerBookingPage.html', message='Not yet implemented!!!!!!!')
 
 
-@app.route('/customerSearchRooms', methods=['POST'])
-def customerSearchRooms():
-    result = db.session.query(rooms).all()
-    for r in result:
-        print(r)
-    return render_template('customerSearchPage.html')
+
+# CUSTOMER SEARCH ROOMS SHOULD BE HERE
+
 
 
 # Handling requests on the employee side of the web app
