@@ -259,7 +259,7 @@ def customerFinishBooking():
         bookingNum = random.randint(40, 9999)
 
         newBooking = Booking(booking_number=bookingNum, room_type=roomType, number_occupants=numOccupants,
-                             renting=False, check_in_date=startDate, check_out_date=endDate,
+                             renting=True, check_in_date=startDate, check_out_date=endDate,
                              total_price=price
                              )
         db.session.add(newBooking)
