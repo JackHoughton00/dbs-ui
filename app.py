@@ -149,10 +149,6 @@ def customerToSearch():
         return render_template('customerSearchPage.html')
 
 
-@app.route('/customerFinishBooking', methods=['POST'])
-def customerFinishBooking():
-    if request.method == 'POST':
-        return render_template('customerBookingPage.html', message='Not yet implemented!!!!!!!')
 
 # CUSTOMER SEARCH ROOMS SHOULD BE HERE
 @app.route('/customerSearchRooms', methods=['POST'])
@@ -209,6 +205,29 @@ def customerSearchRooms():
                     finalResult.append(tmpList)
                     print(r)
             return render_template('customerSearchPage.html',items = itemsList, results = result, roomDetails = finalResult)
+
+
+@app.route('/customerFinishBooking', methods=['POST'])
+def customerFinishBooking():
+    if request.method == 'POST':
+
+        cusSINNum = request.form['customerSIN']
+        cusFirstName = request.form['customerFirstName']
+        cusMiddleName = request.form['customerMiddleName']
+        cusLastName = request.form['customerLastName']
+        cusHouseNum = request.form['customerHouseNumber']
+        cusStreetName = request.form['customerStreetName']
+        cusPostalCode = request.form['customerPostalCode']
+        cusAptNum = request.form['customerApartmentNumber']        
+        cusCityName = request.form['customerCity']
+        cusCountryName = request.form['customerCountry']
+        cusProvinceName = request.form['customerProvince']
+        cusPhoneNumber = request.form['customerPhoneNumber'] 
+
+        if cusSINNum == '' or cusFirstName == '' or cusLastName == '' or cusHouseNum == '' or cusStreetName == '' or cusCityName == '' or cusCountryName == '' or cusPostalCode == '' or cusPhoneNumber == '': 
+            return render_template('customerBookingPage.html', message = 'One or more of your required fields are empty, please try again')
+
+        return render_template('customerBookingPage.html')
 
 
     
