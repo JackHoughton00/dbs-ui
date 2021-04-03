@@ -13,7 +13,7 @@ if ENV == 'dev':
     # uOttawa password
     app.config[
         'SQLALCHEMY_DATABASE_URI'] = 'postgresql://USER:PASS@web0.eecs.uottawa.ca:15432/group_a03_g30'
-        
+       
 else:
     app.debug = False
     app.config['SQLALCHEMY_DATABASE_URI'] = ''
@@ -198,11 +198,14 @@ def customerSearchRooms():
                 x = r[4]
                 if x <= dateTimeFormatted:
                     tmpR3 = str(r[3])
-                    tmpR5 = str(r[5])
                     tmpR6 = str(r[6])
+                    tmpR7 = str(r[7])
+                    tmpR0 = str(r[0])
+
                     tmpList.append('Price: '+tmpR3)
-                    tmpList.append('View Type:'+ tmpR5)
-                    tmpList.append('Amenities:'+ tmpR6)  
+                    tmpList.append('View Type: '+ tmpR6)
+                    tmpList.append('Amenities: '+ tmpR7) 
+                    tmpList.append('Room Number: '+ tmpR0)
                     finalResult.append(tmpList)
                     print(r)
             return render_template('customerSearchPage.html',items = itemsList, results = result, roomDetails = finalResult)
