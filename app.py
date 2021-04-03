@@ -13,7 +13,7 @@ if ENV == 'dev':
     # In the next line change USERNAME to your uOttawa login before the @uOttawa.ca and change PASSWORD to your
     # uOttawa password
     app.config[
-        'SQLALCHEMY_DATABASE_URI'] = 'postgresql://habol085:rb7FkRCtMqJ5Ved@web0.eecs.uottawa.ca:15432/group_a03_g30'
+        'SQLALCHEMY_DATABASE_URI'] = 'postgresql://jhoug049:EightExtended8ex@web0.eecs.uottawa.ca:15432/group_a03_g30'
 
 else:
     app.debug = False
@@ -128,7 +128,7 @@ def submit():
         if role == 'customer':
             return render_template('customerSearchPage.html', items=itemsList)
         elif role == 'employee':
-            return render_template('employeeSearchPage.html')
+            return render_template('employeeSearchPage.html', items=itemsList)
         elif role == 'admin':
             return render_template('homePage.html', message='You do not have permission for this. ')
         else:
@@ -289,12 +289,134 @@ def employeeToSearch():
     if request.method == 'POST':
         return render_template('employeeSearchPage.html')
 
+@app.route('/employeeSearchRooms', methods=['POST'])
+def employeeSearchRooms():
+    cityList = db.session.query(hotel_chain.c.city)
+
+    itemsList = set()
+    for city in cityList:
+        itemsList.add(city[0])
+
+    itemsList = sorted(itemsList)
+
+    if request.method == 'POST':
+        cityName = request.form['citySelect']
+        bookingStartDate = request.form['startDate']
+        bookingEndDate = request.form['endDate']
+
+        if cityName == 'Los angeles':
+            cityName = 'Los Angeles'
+        elif cityName == 'Rio de janeiro':
+            cityName = 'Rio de Janeiro'
+        elif cityName == 'New yorkcity':
+            cityName = 'New York City'
+        elif cityName == 'San jose':
+            cityName = 'San Jose'
+
+        cityName = cityName.capitalize()
+
+        if cityName == '' or bookingStartDate == '' or cityName == 'holder':
+            return render_template('employeeSearchPage.html', message='Either cityName or bookingDate is null.',
+                                   items=itemsList)
+        else:
+
+            yearStart = int(bookingStartDate[0:4])
+            monthStart = int(bookingStartDate[5:7])
+            dayStart = int(bookingStartDate[8:])
+
+            yearEnd = int(bookingEndDate[0:4])
+            monthEnd = int(bookingEndDate[5:7])
+            dayEnd = int(bookingEndDate[8:])
+
+            dateTimeFormattedStart = datetime.datetime(yearStart, monthStart, dayStart, 0, 0)
+            dateTimeFormattedEnd = datetime.datetime(yearEnd, monthEnd, dayEnd, 0, 0)
+            roomDetails.append(dateTimeFormattedStart)
+            roomDetails.append(dateTimeFormattedEnd)
+            result = db.session.query(rooms_hotel_chain, rooms, rooms, hotel_chain).select_from(rooms).join(
+                rooms_hotel_chain).join(hotel_chain).filter(
+                hotel_chain.c.city == cityName and datetime(rooms.c.date_available) <= dateTimeFormattedStart).order_by(
+                rooms.c.room_number.asc())
+            finalResult = []
+            for r in result:
+                tmpList = []
+                x = r[4]
+                if x <= dateTimeFormattedStart:
+                    tmpR3 = str(r[3])
+                    tmpR6 = str(r[6])
+                    tmpR7 = str(r[7])
+                    tmpR0 = str(r[0])
+                    roomDetails.append(tmpR3)
+                    roomDetails.append(tmpR0)
+                    tmpList.append('Price: ' + tmpR3)
+                    tmpList.append('View Type: ' + tmpR6)
+                    tmpList.append('Amenities: ' + tmpR7)
+                    tmpList.append('Room Number: ' + tmpR0)
+                    finalResult.append(tmpList)
+                    print(r)
+            return render_template('employeeSearchPage.html', items=itemsList, results=result, roomDetails=finalResult)
+
 
 @app.route('/employeeFinishBooking', methods=['POST'])
 def employeeFinishBooking():
     if request.method == 'POST':
-        return render_template('employeeBookingPage.html', message="Not yet implimented!!!!!")
 
+        cusSINNum = request.form['customerSIN']
+        cusFirstName = request.form['customerFirstName']
+        cusMiddleName = request.form['customerMiddleName']
+        cusLastName = request.form['customerLastName']
+        cusHouseNum = request.form['customerHouseNumber']
+        cusStreetName = request.form['customerStreetName']
+        cusPostalCode = request.form['customerPostalCode']
+        cusAptNum = request.form['customerApartmentNumber']
+        cusCityName = request.form['customerCity']
+        cusCountryName = request.form['customerCountry']
+        cusProvinceName = request.form['customerProvince']
+        cusPhoneNumber = request.form['customerPhoneNumber']
+        numOccupants = request.form['numberOfOccupants']
+
+        if cusSINNum == '' or cusFirstName == '' or cusLastName == '' or cusHouseNum == '' or cusStreetName == '' \
+                or cusCityName == '' or cusCountryName == '' or cusPostalCode == '' or cusPhoneNumber == '' \
+                or numOccupants == '':
+            return render_template('employeeBookingPage.html',
+                                   message='One or more of your required fields are empty, please try again')
+
+        startDate = roomDetails[0]
+        endDate = roomDetails[1]
+        x = endDate - startDate
+        x = int(x.days)
+        print(x)
+
+        price = float(roomDetails[2])
+        roomNum = roomDetails[3]
+
+        price = price * x
+        roomTypes = ['Single', 'Double', 'Double-double', 'Triple', 'Quad', 'Queen', 'King', 'Studio', 'Twin']
+        roomType = random.choice(roomTypes)
+        bookingNum = random.randint(40, 9999)
+
+        newBooking = Booking(booking_number=bookingNum, room_type=roomType, number_occupants=numOccupants,
+                             renting=True, check_in_date=startDate, check_out_date=endDate,
+                             total_price=price
+                             )
+        db.session.add(newBooking)
+        db.session.commit()
+
+        newCustomer = Customer(cust_sin_number=cusSINNum, first_name=cusFirstName, middle_name=cusMiddleName,
+                               last_name=cusLastName, house_number=cusHouseNum, street_name=cusStreetName,
+                               postal_code=cusPostalCode, apt_number=cusAptNum, city=cusCityName,
+                               country=cusCountryName, province=cusProvinceName, phone_number=cusPhoneNumber,
+                               registration_date=datetime.datetime.today()
+                               )
+        db.session.add(newCustomer)
+        db.session.commit()
+
+        return render_template('employeeBookingPage.html')
+
+
+@app.route('/employeeCheckIn', methods =['POST'])
+def employeeCheckIn():
+    if request.method == 'POST':
+        return render_template('employeeCheckIn.html')
 
 if __name__ == '__main__':
     app.run()
