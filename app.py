@@ -13,7 +13,7 @@ if ENV == 'dev':
     # In the next line change USERNAME to your uOttawa login before the @uOttawa.ca and change PASSWORD to your
     # uOttawa password
     app.config[
-        'SQLALCHEMY_DATABASE_URI'] = 'postgresql://jhoug049:EightExtended8ex@web0.eecs.uottawa.ca:15432/group_a03_g30'
+        'SQLALCHEMY_DATABASE_URI'] = 'postgresql://habol085:rb7FkRCtMqJ5Ved@web0.eecs.uottawa.ca:15432/group_a03_g30'
 
 else:
     app.debug = False
@@ -96,6 +96,13 @@ class Customer(Base):
     province = db.Column(db.VARCHAR(50))
     phone_number = db.Column(db.VARCHAR(50))
     registration_date = db.Column(db.DateTime)
+
+class Makes(Base):
+    __tablename__ = 'makes'
+    __table_args__ = {'schema': 'hoteldbs', 'extend_existing': True}
+    booking_number = db.Column(db.Integer, primary_key=True)
+    cust_sin_number = db.Column(db.Integer)
+    emp_sin_number = db.Column(db.Integer)
 
 
 # Handling requests that are applicable throughout the entirety of the web app
@@ -274,6 +281,10 @@ def customerFinishBooking():
         db.session.add(newCustomer)
         db.session.commit()
 
+        newMakes = Makes(booking_number=bookingNum, cust_sin_number=cusSINNum)
+        db.session.add(newMakes)
+        db.session.commit()
+
         return render_template('customerBookingPage.html')
 
 
@@ -408,6 +419,10 @@ def employeeFinishBooking():
                                registration_date=datetime.datetime.today()
                                )
         db.session.add(newCustomer)
+        db.session.commit()
+
+        newMakes = Makes(booking_number=bookingNum, cust_sin_number=cusSINNum )
+        db.session.add(newMakes)
         db.session.commit()
 
         return render_template('employeeBookingPage.html')
