@@ -13,7 +13,7 @@ if ENV == 'dev':
     # In the next line change USERNAME to your uOttawa login before the @uOttawa.ca and change PASSWORD to your
     # uOttawa password
     app.config[
-        'SQLALCHEMY_DATABASE_URI'] = 'postgresql://habol085:rb7FkRCtMqJ5Ved@web0.eecs.uottawa.ca:15432/group_a03_g30'
+        'SQLALCHEMY_DATABASE_URI'] = 'postgresql://jhoug049:EightExtended8ex@web0.eecs.uottawa.ca:15432/group_a03_g30'
 
 else:
     app.debug = False
@@ -29,7 +29,15 @@ rooms_hotel_chain = db.Table('room_hotel_chain', db.metadata, autoload=True, aut
 
 hotel_chain = db.Table('hotel_chain', db.metadata, autoload=True, autoload_with=db.engine, schema='hoteldbs')
 
+booking = db.Table('booking', db.metadata, autoload = True, autoload_with=db.engine, schema='hoteldbs')
+
+makes = db.Table('makes', db.metadata, autoload = True, autoload_with=db.engine, schema='hoteldbs')
+
+customer = db.Table('customer', db.metadata, autoload = True, autoload_with=db.engine, schema='hoteldbs')
+
 Base = declarative_base()
+
+
 
 
 class Rooms(Base):
@@ -431,7 +439,36 @@ def employeeFinishBooking():
 @app.route('/employeeCheckIn', methods =['POST'])
 def employeeCheckIn():
     if request.method == 'POST':
+
         return render_template('employeeCheckIn.html')
+
+@app.route('/employeeCheckInSearch', methods = ['POST'])
+
+def employeeCheckInSearch():
+    
+
+
+    if request.method == 'POST':
+         
+        custSIN = request.form['customerSIN']
+        custSIN = int(custSIN)
+        result = db.session.query(booking,makes,customer).select_from(booking).join(
+        makes).join(customer).filter(
+            customer.c.cust_sin_number == makes.c.cust_sin_number and makes.c.booking_number == booking.c.booking_number ).order_by(customer.c.cust_sin_number.asc())
+
+        tmpList = set()
+        for r in result: 
+            x = r[8]
+            y = r[3] 
+
+            if x == custSIN and y == True: 
+                tmpList.add(r)
+
+
+
+        return render_template('employeeCheckIn.html', items = tmpList)
+
+
 
 if __name__ == '__main__':
     app.run()
