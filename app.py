@@ -457,16 +457,29 @@ def employeeCheckInSearch():
             customer.c.cust_sin_number == makes.c.cust_sin_number and makes.c.booking_number == booking.c.booking_number ).order_by(customer.c.cust_sin_number.asc())
 
         tmpList = set()
+        bookingList = set()
         for r in result: 
             x = r[8]
             y = r[3] 
-
             if x == custSIN and y == True: 
                 tmpList.add(r)
-
-
-
         return render_template('employeeCheckIn.html', items = tmpList)
+
+@app.route('/employeeCheckingCustomerIn', methods = ['POST'])
+def employeeCheckingCustomerIn():
+
+    if request.method == 'POST':
+        
+        tmpData = request.form['bookings']
+        tmpData = tmpData.split(',')
+        print(tmpData)
+        bookingId = tmpData[0][1:]
+        print(bookingId)
+
+        return render_template('employeeCheckIn.html')
+
+
+
 
 
 
