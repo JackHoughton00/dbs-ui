@@ -13,7 +13,7 @@ if ENV == 'dev':
     # In the next line change USERNAME to your uOttawa login before the @uOttawa.ca and change PASSWORD to your
     # uOttawa password
     app.config[
-        'SQLALCHEMY_DATABASE_URI'] = 'postgresql://jhoug049:EightExtended8ex@web0.eecs.uottawa.ca:15432/group_a03_g30'
+        'SQLALCHEMY_DATABASE_URI'] = 'postgresql://habol085:rb7FkRCtMqJ5Ved@web0.eecs.uottawa.ca:15432/group_a03_g30'
 
 else:
     app.debug = False
@@ -429,14 +429,14 @@ def employeeFinishBooking():
         db.session.add(newCustomer)
         db.session.commit()
 
-        newMakes = Makes(booking_number=bookingNum, cust_sin_number=cusSINNum )
+        newMakes = Makes(booking_number=bookingNum, cust_sin_number=cusSINNum)
         db.session.add(newMakes)
         db.session.commit()
 
         return render_template('employeeBookingPage.html')
 
 
-@app.route('/employeeCheckIn', methods =['POST'])
+@app.route('/employeeCheckIn', methods=['POST'])
 def employeeCheckIn():
     if request.method == 'POST':
 
@@ -476,7 +476,13 @@ def employeeCheckingCustomerIn():
         bookingId = tmpData[0][1:]
         print(bookingId)
 
+        q = db.session.query(Booking)
+        q = q.filter(Booking.booking_number == int(bookingId))
+        q.one().renting = False
+        db.session.commit()
+
         return render_template('employeeCheckIn.html')
+
 
 
 
