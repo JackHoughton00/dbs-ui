@@ -1,3 +1,4 @@
+#All the imports
 import random
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
@@ -13,7 +14,7 @@ if ENV == 'dev':
     # In the next line change USERNAME to your uOttawa login before the @uOttawa.ca and change PASSWORD to your
     # uOttawa password
     app.config[
-        'SQLALCHEMY_DATABASE_URI'] = 'postgresql://habol085:rb7FkRCtMqJ5Ved@web0.eecs.uottawa.ca:15432/group_a03_g30'
+        'SQLALCHEMY_DATABASE_URI'] = 'postgresql://USER:PASS@web0.eecs.uottawa.ca:15432/group_a03_g30'
 
 else:
     app.debug = False
@@ -23,6 +24,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
+#These tables will be used for queries to be done later on in the program. 
 rooms = db.Table('room', db.metadata, autoload=True, autoload_with=db.engine, schema='hoteldbs')
 
 rooms_hotel_chain = db.Table('room_hotel_chain', db.metadata, autoload=True, autoload_with=db.engine, schema='hoteldbs')
@@ -39,7 +41,7 @@ Base = declarative_base()
 
 
 
-
+#These classes will be used to import data into the database on postgre
 class Rooms(Base):
     __tablename__ = 'room'
     __table_args__ = {'schema': 'hoteldbs', 'extend_existing': True}
@@ -121,11 +123,15 @@ def backHome():
 
 
 # Handling requests that are applicable on the home page of the web app.
+
+#Base route. This loads the homepage. 
 @app.route('/')
 def homePage():
     return render_template('homePage.html')
 
 
+#This is activated when the submit button is pressed on the homepage. It reads which choice was selected from the dropdown menu and directs to the
+#next page. 
 @app.route('/homeSubmit', methods=['POST'])
 def submit():
     result = db.session.query(hotel_chain.c.city)
@@ -158,16 +164,17 @@ def customerToBooking():
         return render_template('customerBookingPage.html')
 
 
+#Returns to the customerSearchPage.html
 @app.route('/customerBackToSearch', methods=['POST'])
 def customerToSearch():
     if request.method == 'POST':
         return render_template('customerSearchPage.html')
 
 
-# CUSTOMER SEARCH ROOMS SHOULD BE HERE
+#Global variable to store room details
 roomDetails = []
 
-
+#Handles the searching and querying to find the rooms based on a selected city and dates
 @app.route('/customerSearchRooms', methods=['POST'])
 def customerSearchRooms():
     cityList = db.session.query(hotel_chain.c.city)
@@ -235,6 +242,7 @@ def customerSearchRooms():
             return render_template('customerSearchPage.html', items=itemsList, results=result, roomDetails=finalResult)
 
 
+#Processes the customers information and booking details
 @app.route('/customerFinishBooking', methods=['POST'])
 def customerFinishBooking():
     if request.method == 'POST':
@@ -264,7 +272,6 @@ def customerFinishBooking():
         x = endDate - startDate
         x = int(x.days)
         print(x)
-
         price = float(roomDetails[2])
         roomNum = roomDetails[3]
 
@@ -297,17 +304,20 @@ def customerFinishBooking():
 
 
 # Handling requests on the employee side of the web app
+
+#Routes back to employeeBookingPage.html
 @app.route('/employeeToBooking', methods=['POST'])
 def employeeToBooking():
     if request.method == 'POST':
         return render_template('employeeBookingPage.html')
 
-
+#Routes back to employeeSearchPage.html
 @app.route('/employeeBackToSearch', methods=['POST'])
 def employeeToSearch():
     if request.method == 'POST':
         return render_template('employeeSearchPage.html')
 
+#Handles the searching and querying to find the rooms based on a selected city and dates
 @app.route('/employeeSearchRooms', methods=['POST'])
 def employeeSearchRooms():
     cityList = db.session.query(hotel_chain.c.city)
@@ -374,7 +384,7 @@ def employeeSearchRooms():
                     print(r)
             return render_template('employeeSearchPage.html', items=itemsList, results=result, roomDetails=finalResult)
 
-
+#Processes the customers information and booking details
 @app.route('/employeeFinishBooking', methods=['POST'])
 def employeeFinishBooking():
     if request.method == 'POST':
@@ -435,27 +445,22 @@ def employeeFinishBooking():
 
         return render_template('employeeBookingPage.html')
 
-
+#Routes back to employeeCheckIn.html
 @app.route('/employeeCheckIn', methods=['POST'])
 def employeeCheckIn():
     if request.method == 'POST':
 
         return render_template('employeeCheckIn.html')
 
+#Searches through the bookings in order to check a customer in
 @app.route('/employeeCheckInSearch', methods = ['POST'])
-
 def employeeCheckInSearch():
-    
-
-
     if request.method == 'POST':
-         
         custSIN = request.form['customerSIN']
         custSIN = int(custSIN)
         result = db.session.query(booking,makes,customer).select_from(booking).join(
         makes).join(customer).filter(
             customer.c.cust_sin_number == makes.c.cust_sin_number and makes.c.booking_number == booking.c.booking_number ).order_by(customer.c.cust_sin_number.asc())
-
         tmpList = set()
         bookingList = set()
         for r in result: 
@@ -465,6 +470,8 @@ def employeeCheckInSearch():
                 tmpList.add(r)
         return render_template('employeeCheckIn.html', items = tmpList)
 
+
+#Processing checking a customer into their room. 
 @app.route('/employeeCheckingCustomerIn', methods = ['POST'])
 def employeeCheckingCustomerIn():
 
@@ -482,12 +489,6 @@ def employeeCheckingCustomerIn():
         db.session.commit()
 
         return render_template('employeeCheckIn.html')
-
-
-
-
-
-
 
 if __name__ == '__main__':
     app.run()
